@@ -1,0 +1,79 @@
+[
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About",
+    "section": "",
+    "text": "About this blog"
+  },
+  {
+    "objectID": "posts/welcome/index.html",
+    "href": "posts/welcome/index.html",
+    "title": "Welcome To My Blog",
+    "section": "",
+    "text": "This is the first post in a Quarto blog. Welcome!\n\nSince this post doesn’t specify an explicit image, the first image in the post will be used in the listing page of posts."
+  },
+  {
+    "objectID": "posts/post-with-code/index.html",
+    "href": "posts/post-with-code/index.html",
+    "title": "Post With Code",
+    "section": "",
+    "text": "This is a post with executable code."
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Optimizing Real-Time Transit Data Collection: A Journey To Serverless Architecture",
+    "section": "",
+    "text": "Every student at UBC faces a common dilemma: when is the optimal time to leave for catching public transit? This seemingly simple question sparked my personal project into if we can predict transit arrival times. In this blog post, I want to detail my data engineering journey that evolved from a local development environment to a cost-effective serverless architecture. This post will describe the technical challenges, architectural decisions, and optimization strategies encountered while building a system to collect real-time transit data from Vancouver’s Translink Bus Company."
+  },
+  {
+    "objectID": "index.html#introduction",
+    "href": "index.html#introduction",
+    "title": "Optimizing Real-Time Transit Data Collection: A Journey To Serverless Architecture",
+    "section": "",
+    "text": "Every student at UBC faces a common dilemma: when is the optimal time to leave for catching public transit? This seemingly simple question sparked my personal project into if we can predict transit arrival times. In this blog post, I want to detail my data engineering journey that evolved from a local development environment to a cost-effective serverless architecture. This post will describe the technical challenges, architectural decisions, and optimization strategies encountered while building a system to collect real-time transit data from Vancouver’s Translink Bus Company."
+  },
+  {
+    "objectID": "index.html#the-initial-approach-local-development-challenges",
+    "href": "index.html#the-initial-approach-local-development-challenges",
+    "title": "Optimizing Real-Time Transit Data Collection: A Journey To Serverless Architecture",
+    "section": "The Initial Approach: Local Development Challenges",
+    "text": "The Initial Approach: Local Development Challenges\nThe project began with a straightforward implementation using Jupyter Notebooks to collect real-time bus data. The data collection process involved making API calls every 5 minutes, each returning 15,000-20,000 rows of transit data. The entire process is orchestrated by Apache Airflow, an event scheduler. While this approach worked initially, I quickly ran into an issue that was quite ironic:\nMy laptop cannot be on 24/7: The requirement for a continuously running laptop created reliability issues, particularly for collecting data during actual commute times - the data I need the most. For example, when I’m on the bus, I cannot collect any data. I could connect my laptop to my mobile hotspot, but that has its own reliability issues too.\nIf you worked on any data science or software engineer project, you know the pain of “it works on my computer”, and the actual challenge of implementing it in production. So, there is a long journey ahead."
+  },
+  {
+    "objectID": "index.html#exploring-cloud-infrastructure-options",
+    "href": "index.html#exploring-cloud-infrastructure-options",
+    "title": "Optimizing Real-Time Transit Data Collection: A Journey To Serverless Architecture",
+    "section": "Exploring Cloud Infrastructure Options",
+    "text": "Exploring Cloud Infrastructure Options\nTo run the data collection process 24/7, I needed to migrate my process to the cloud. Since Amazon Web Services (AWS) was offering free trials, I decided to sign up for one.\n\nTraditional VM Approach\nAWS offers a free tier t2.micro instance of computing, which has 750 hours of usage per month. But there is no free lunch, and the t2.micro has its own set of challenges:\n\nMemory Limitations: The 1GB RAM allocation proved insufficient for running both Jupyter Notebook and Airflow scheduler. My original process of Apache Airflow to schedule notebook execution introduced significant computational overhead, as it required running the entire Jupyter environment for each data collection cycle.\nDatabase Considerations: The local SQLite implementation would need migration to a cloud database like AWS RDS, introducing additional complexity and cost.\nCost Analysis: A preliminary calculation showed that upgrading to t2.large instances with 16GB RAM and maintaining a separate database instance would result in monthly costs approaching US$120.\n\n\n\nHardware Alternative Consideration\nA Mac Mini (US$499) was evaluated as a potential solution, but it wasn’t optimal: - Limited storage options (256GB disc space) requiring costly upgrades - Maintenance and reliability concerns for a dedicated machine. Sometimes, I would have to SSH into the Mac Mini to check progress, but it’s a big security concern to expose the ports to all of the internet."
+  },
+  {
+    "objectID": "index.html#resource-utilization-analysis",
+    "href": "index.html#resource-utilization-analysis",
+    "title": "Optimizing Real-Time Transit Data Collection: A Journey To Serverless Architecture",
+    "section": "Resource Utilization Analysis",
+    "text": "Resource Utilization Analysis\nI need an even cheaper option. I examined my workflow, and discovered that: - Each data collection cycle consumed approximately 10 seconds - Daily operation required roughly 500 cycles - Total daily computation time: 5000 seconds (83 minutes) - Traditional VM approach would result in 95% idle time\nI need something that can run workflow on the VM for 10 seconds every 5 min, then shut off the process, saving cost. Fortunately, AWS has something just for that."
+  },
+  {
+    "objectID": "index.html#the-serverless-option-implementing-aws-lambda",
+    "href": "index.html#the-serverless-option-implementing-aws-lambda",
+    "title": "Optimizing Real-Time Transit Data Collection: A Journey To Serverless Architecture",
+    "section": "The Serverless Option: Implementing AWS Lambda",
+    "text": "The Serverless Option: Implementing AWS Lambda\nAWS lambda is a serverless compute service that lets you run code without provisioning or managing servers. It works by running your code in a container, and then shutting off the container after the code is done running. It’s a pay-per-use model, and it’s perfect for my use case.\n\nArchitectural Benefits\nThe shift to AWS Lambda addressed several key challenges:\n\nCost Optimization: Pay-per-use billing model aligns perfectly with the intermittent nature of data collection\nStorage Efficiency: Replacing traditional database writes with S3 blob storage reduced operational complexity and costs\nContainerization: Packaging my entire workflow into Docker containers simplified deployment and configuration management\n\n\n\nTechnical Implementation\nI utilized several AWS tools to build my own system:\n\nEvent Triggers: AWS EventBridge manages 5-minute interval executions\nAPI key management: AWS Secrets Manager to manage API keys\nContainerization: Docker containers package Python scripts, replacing Jupyter notebooks. Containers are stored in AWS ECR (Elastic Container Registry).\nStorage: Amazon S3 provides durable, cost-effective storage for CSV/Parquet data\nResource Optimization: Reduced RAM usage through optimized Python scripts. Each job only needs 512MB of RAM."
+  },
+  {
+    "objectID": "index.html#results-and-performance-metrics",
+    "href": "index.html#results-and-performance-metrics",
+    "title": "Optimizing Real-Time Transit Data Collection: A Journey To Serverless Architecture",
+    "section": "Results and Performance Metrics",
+    "text": "Results and Performance Metrics\nAfter two weeks of operation, the serverless architecture demonstrated impressive results:\n\nData Volume: Successfully collecting 3.9 million rows of data daily, approaching around 50 million rows currently\nCost Efficiency: Monthly expenses reduced to US$1-2 for the entire system\nReliability: No system failures or data loss reported\nMaintainability: Independent event execution prevents cascading failures. Previously, if some jobs were stuck in Airflow, it would prevent further jobs from running. With Lambda, each job is its own container, and job failures do not affect other jobs.\nDurability: S3 storage ensures data persistence without additional management overhead\n\nWhen I need the data, I could just run a simple cli command to copy all the data onto my local computer."
+  },
+  {
+    "objectID": "index.html#whats-the-next-step",
+    "href": "index.html#whats-the-next-step",
+    "title": "Optimizing Real-Time Transit Data Collection: A Journey To Serverless Architecture",
+    "section": "What’s the next step?",
+    "text": "What’s the next step?\nSince figuring out AWS Lambda, I added another similar workflow to collect hourly weather forecast. I hypothesize that on colder or rainy days, there would be more delay for the bus network. This could be that more people are incentivized to take public transportation rather than walking or biking, or could prompt more people to drive. Most transit app tells me when might the next bus arrivals, but never gives me any historical data. I think I could create an app that fills in this demand.\nI’ve began working on the modeling process. Uber has a great blog about it that I’m currently exploring. Instead of predicting everything, the model tries to predict the difference (residual) between what the routing engine is suggesting versus what the actual ETA is. I believe that the same idea could be applied on the bus network. I’ve had several encouters where I know buses are usually delayed on certain routes during certain times, why can’t a machine learn these patterns?"
+  }
+]
