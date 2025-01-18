@@ -230,6 +230,12 @@ window.Quarto = {
 </section>
 <section id="the-serverless-option-implementing-aws-lambda" class="level2">
 <h2 class="anchored" data-anchor-id="the-serverless-option-implementing-aws-lambda">The Serverless Option: Implementing AWS Lambda</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/system_design_data_eng.jpg" class="img-fluid figure-img" style="width:50.0%"></p>
+<figcaption>Data Ingestion: System design showing the data ingestion pipeline using AWS Lambda, EventBridge, and S3</figcaption>
+</figure>
+</div>
 <p>AWS lambda is a serverless compute service that lets you run code without provisioning or managing servers. It works by running your code in a container, and then shutting off the container after the code is done running. It’s a pay-per-use model, and it’s perfect for my use case.</p>
 <section id="architectural-benefits" class="level3">
 <h3 class="anchored" data-anchor-id="architectural-benefits">Architectural Benefits</h3>
@@ -267,7 +273,14 @@ window.Quarto = {
 <section id="whats-the-next-step" class="level2">
 <h2 class="anchored" data-anchor-id="whats-the-next-step">What’s the next step?</h2>
 <p>Since figuring out AWS Lambda, I added another similar workflow to collect hourly weather forecast. I hypothesize that on colder or rainy days, there would be more delay for the bus network. This could be that more people are incentivized to take public transportation rather than walking or biking, or could prompt more people to drive. Most transit app tells me when might the next bus arrivals, but never gives me any historical data. I think I could create an app that fills in this demand.</p>
-<p>I’ve began working on the modeling process. Uber has a <a href="https://www.uber.com/en-CA/blog/deepeta-how-uber-predicts-arrival-times/">great blog</a> about it that I’m currently exploring. Instead of predicting everything, the model tries to predict the difference (residual) between what the routing engine is suggesting versus what the actual ETA is. I believe that the same idea could be applied on the bus network. I’ve had several encouters where I know buses are usually delayed on certain routes during certain times, why can’t a machine learn these patterns?</p>
+<p>I’ve began working on the modeling process. Uber has a <a href="https://www.uber.com/en-CA/blog/deepeta-how-uber-predicts-arrival-times/">great blog</a> about it that I’m currently exploring. Instead of predicting everything, the model tries to predict the difference (residual) between what the routing engine is suggesting versus what the actual ETA is. I believe that the same idea could be applied on the bus network. I’ve had several encounters where I know buses are usually delayed on certain routes during certain times, why can’t a machine learn these patterns?</p>
+<p>Below is the full system design that I’m looking to implement.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/system_design_full.png" class="img-fluid figure-img"></p>
+<figcaption>Full System Design</figcaption>
+</figure>
+</div>
 
 
 
@@ -428,7 +441,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
     var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
     var mailtoRegex = new RegExp(/^mailto:/);
-      var filterRegex = new RegExp('/' + window.location.host + '/');
+      var filterRegex = new RegExp("https:\/\/investor55\.github\.io\/524-lab2-blog\/");
     var isInternal = (href) => {
         return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
     }
