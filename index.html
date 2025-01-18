@@ -225,7 +225,20 @@ window.Quarto = {
 </section>
 <section id="resource-utilization-analysis" class="level2">
 <h2 class="anchored" data-anchor-id="resource-utilization-analysis">Resource Utilization Analysis</h2>
-<p>I need an even cheaper option. I examined my workflow, and discovered that: - Each data collection cycle consumed approximately 10 seconds - Daily operation required roughly 500 cycles - Total daily computation time: 5000 seconds (83 minutes) - Traditional VM approach would result in 95% idle time</p>
+<p>I need an even cheaper option. I examined my workflow, and discovered that:</p>
+<ul>
+<li>Each data collection cycle consumed approximately 10 seconds</li>
+<li>Daily operation required roughly 500 cycles</li>
+<li>Total daily computation time: 5000 seconds (83 minutes)</li>
+<li>Traditional VM approach would result in 95% idle time</li>
+</ul>
+<p>You can see the usage pattern of the data fetcher in the image below after migrating to the cloud.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/aws_lambda_usage.jpg" class="img-fluid figure-img" style="width:50.0%"></p>
+<figcaption>Data Fetcher Usage Pattern</figcaption>
+</figure>
+</div>
 <p>I need something that can run workflow on the VM for 10 seconds every 5 min, then shut off the process, saving cost. Fortunately, AWS has something just for that.</p>
 </section>
 <section id="the-serverless-option-implementing-aws-lambda" class="level2">
@@ -256,6 +269,7 @@ window.Quarto = {
 <li><strong>Storage</strong>: Amazon S3 provides durable, cost-effective storage for CSV/Parquet data</li>
 <li><strong>Resource Optimization</strong>: Reduced RAM usage through optimized Python scripts. Each job only needs 512MB of RAM.</li>
 </ul>
+<p>One question you might have is that why I stopped using a database all together. Let me explain. S3 is what’s called a data lake. Traditional databases enforce “schema-on-write” – meaning data must conform to a predefined structure before storage. Here, I’m adopting a “schema-on-read” approach with data lakes, where data can be stored in its raw form and structure is only imposed when the data is retrieved. Since I have to do additional data cleaning and ETL anyway, this approach is more cost effective.</p>
 </section>
 </section>
 <section id="results-and-performance-metrics" class="level2">
@@ -269,13 +283,26 @@ window.Quarto = {
 <li><strong>Durability</strong>: S3 storage ensures data persistence without additional management overhead</li>
 </ul>
 <p>When I need the data, I could just run a simple <code>cli</code> command to copy all the data onto my local computer.</p>
+<p>Below are the screenshots of my AWS billing dashboard for this project and cost breakdown. As you can see, the current solution is very cost effective.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/aws_billing_main.jpg" class="img-fluid figure-img" style="width:50.0%"></p>
+<figcaption>AWS Billing Dashboard</figcaption>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/aws_billing_breakdown.jpg" class="img-fluid figure-img" style="width:50.0%"></p>
+<figcaption>AWS Billing Breakdown</figcaption>
+</figure>
+</div>
 </section>
 <section id="whats-the-next-step" class="level2">
 <h2 class="anchored" data-anchor-id="whats-the-next-step">What’s the next step?</h2>
 <p>Since figuring out AWS Lambda, I added another similar workflow to collect hourly weather forecast. I hypothesize that on colder or rainy days, there would be more delay for the bus network. This could be that more people are incentivized to take public transportation rather than walking or biking, or could prompt more people to drive. Most transit app tells me when might the next bus arrivals, but never gives me any historical data. I think I could create an app that fills in this demand.</p>
 <p>I’ve began working on the modeling process. Uber has a <a href="https://www.uber.com/en-CA/blog/deepeta-how-uber-predicts-arrival-times/">great blog</a> about it that I’m currently exploring. Instead of predicting everything, the model tries to predict the difference (residual) between what the routing engine is suggesting versus what the actual ETA is. I believe that the same idea could be applied on the bus network. I’ve had several encounters where I know buses are usually delayed on certain routes during certain times, why can’t a machine learn these patterns?</p>
 <p>Below is the full system design that I’m looking to implement.</p>
-<p>If you are intersted in this project in modeling or data engineering, please contact me on Slack <span class="citation" data-cites="Jiayi">@Jiayi</span> Li</p>
+<p>If you are interested in this project in modeling or data engineering, please contact me on Slack <span class="citation" data-cites="Jiayi">@Jiayi</span> Li</p>
 <p><img src="img/system_design_full.png" class="img-fluid quarto-figure quarto-figure-center" alt="Full System Design"> <em>Note: The XGBoost logo isn’t rendering correctly, but it’s there above PyTorch deep learning models.</em></p>
 
 
